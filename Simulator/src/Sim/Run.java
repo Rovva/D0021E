@@ -6,8 +6,8 @@ public class Run {
 	public static void main (String [] args)
 	{
  		//Creates two links (maxDelay, lossProbability)
- 		LossyLink link1 = new LossyLink(50, 30);
-		LossyLink link2 = new LossyLink(30, 50);
+ 		LossyLink link1 = new LossyLink(50, 0);
+		LossyLink link2 = new LossyLink(30, 0);
 		
 		// Create two end hosts that will be
 		// communicating via the router
@@ -27,12 +27,12 @@ public class Run {
 		routeNode.connectInterface(0, link1, host1);
 		routeNode.connectInterface(1, link2, host2);
 		
-		int CBR = 5;
+		
 		// Generate some traffic
 		// host1 will send 3 messages with time interval 5 to network 2, node 1. Sequence starts with number 1
-		host1.StartSending(2, 2, 10000, CBR, 1); 
+		host1.StartSending(2, 2, 5, "Poisson", 1, 5); 
 		// host2 will send 2 messages with time interval 10 to network 1, node 1. Sequence starts with number 10
-		host2.StartSending(1, 1, 10000, CBR, 10); 
+		//host2.StartSending(1, 1, 5, "Poisson", 10, 10); 
 		
 		// Start the simulation engine and of we go!
 		Thread t=new Thread(SimEngine.instance());
