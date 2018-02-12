@@ -52,8 +52,8 @@ public class Node extends SimEnt {
 	private int _toHost = 0;
 	private int timeInterval;
 	private String generator;
-	public ArrayList<Object> receivedDelay = new ArrayList<Object>();
-	public ArrayList<Object> sentDelay = new ArrayList<Object>();
+	public ArrayList<Double> receivedDelay = new ArrayList<Double>();
+	public ArrayList<Double> sentDelay = new ArrayList<Double>();
 	
 	public void StartSending(int network, int node, int number, String generator, int startSeq, int cbrInterval)
 	{
@@ -114,7 +114,7 @@ public class Node extends SimEnt {
 				send(this, new TimerEvent(),_timeBetweenSending);
 				//System.out.println("Node "+_id.networkId()+ "." + _id.nodeId() +" sent message with seq: "+_seq + " at time "+SimEngine.getTime());
 				double time = SimEngine.getTime();
-				receivedDelay.add(time);
+				sentDelay.add(time);
 				_seq++;
 			}
 		}

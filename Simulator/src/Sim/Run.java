@@ -32,7 +32,7 @@ public class Run {
 		// host1 will send 3 messages with time interval 5 to network 2, node 1. Sequence starts with number 1
 		host1.StartSending(2, 2, 5, "Poisson", 1, 5); 
 		// host2 will send 2 messages with time interval 10 to network 1, node 1. Sequence starts with number 10
-		//host2.StartSending(1, 1, 5, "Poisson", 10, 10); 
+		host2.StartSending(1, 1, 5, "Poisson", 10, 10); 
 		
 		// Start the simulation engine and of we go!
 		Thread t=new Thread(SimEngine.instance());
@@ -46,7 +46,33 @@ public class Run {
 		{
 			System.out.println("The motor seems to have a problem, time for service?");
 		}		
+		double totalSentPackets1 = host1.sentDelay.size();
+		double totalSentPackets2 = host2.sentDelay.size();
+		
+		double totalRecievedPackets1 = host1.receivedDelay.size();
+		double totalRecievedPackets2 = host2.receivedDelay.size();
+		
+		double averageDelay = 0.0;
+		double averageJitter = 0.0;
+		
+		for(int i = 0; i < host1.receivedDelay.size(); i++) {
+			averageDelay = averageDelay + host1.receivedDelay.get(i);
+		}
+		
+		averageDelay = averageDelay / host1.receivedDelay.size();
 
+		System.out.println("Node 1 results: ");
+		System.out.println("Total sent packets: " + host1.sentDelay.size());
+		System.out.println("Total received packets: " + host1.receivedDelay.size());
+		System.out.println("Average delay: " + averageDelay);
+		System.out.println("Average jitter: " + averageJitter);
+		
+		
+		//System.out.println(host1.receivedDelay.get(1).toString());
+		
+		//averageDelay = averageDelay/totalSentPackets1;
+		
+		/*
 		double totalSentPackets1 = host1.sentPackets(); //Sent packets for node 1
 		double totalSentPackets2 = host2.sentPackets();	//Sent packets for node 2
 		
@@ -75,7 +101,7 @@ public class Run {
 		System.out.println("Total sent packets: " + (int)totalSentPackets2 + "\nTotal packets received: " + (int)totalRecievedPackets2 + 
 				"\nTotal lost packets: " + (int)dropped2 + "\nAverage delay: " + averageDelay2 + " ms" + "\nAverage jitter: " + averageJitter2 + " ms");
 		System.out.println("----------------------------");
-
+		*/
 
 	}
 }
