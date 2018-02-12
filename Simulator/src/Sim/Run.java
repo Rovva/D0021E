@@ -45,28 +45,60 @@ public class Run {
 		catch (Exception e)
 		{
 			System.out.println("The motor seems to have a problem, time for service?");
-		}		
-		double totalSentPackets1 = host1.sentDelay.size();
-		double totalSentPackets2 = host2.sentDelay.size();
-		
-		double totalRecievedPackets1 = host1.receivedDelay.size();
-		double totalRecievedPackets2 = host2.receivedDelay.size();
+		}
 		
 		double averageDelay = 0.0;
-		double averageJitter = 0.0;
+		double averagejitter = 0.0;
 		
 		for(int i = 0; i < host1.receivedDelay.size(); i++) {
 			averageDelay = averageDelay + host1.receivedDelay.get(i);
 		}
 		
 		averageDelay = averageDelay / host1.receivedDelay.size();
-
-		System.out.println("Node 1 results: ");
+		
+		
+		for(int i = 0; i <= host1.receivedDelay.size(); i++) {
+			if(i+1 >= host1.receivedDelay.size()) {
+				break;
+			} else {
+				averagejitter = averagejitter + Math.abs(host1.receivedDelay.get(i+1) - host1.receivedDelay.get(i));
+			}
+		}
+		
+		averagejitter = averagejitter / host1.receivedDelay.size();
+		
+		System.out.println("Node 1 results (using: " + host1.returnGenerator() + " generator): ");
 		System.out.println("Total sent packets: " + host1.sentDelay.size());
 		System.out.println("Total received packets: " + host1.receivedDelay.size());
-		System.out.println("Average delay: " + averageDelay);
-		System.out.println("Average jitter: " + averageJitter);
+		System.out.println("Average delay: " + averageDelay + " ms");
+		System.out.println("Average jitter: " + averagejitter + " ms");
 		
+		averageDelay = 0.0;
+		
+		for(int i = 0; i < host2.receivedDelay.size(); i++) {
+			averageDelay = averageDelay + host2.receivedDelay.get(i);
+		}
+		
+		averageDelay = averageDelay / host2.receivedDelay.size();
+		
+		averagejitter = 0.0;
+		
+		for(int i = 0; i <= host2.receivedDelay.size(); i++) {
+			if(i+1 >= host2.receivedDelay.size()) {
+				break;
+			} else {
+				averagejitter = averagejitter + Math.abs(host2.receivedDelay.get(i+1) - host2.receivedDelay.get(i));
+			}
+		}
+		
+		averagejitter = averagejitter / host2.receivedDelay.size();
+		
+		System.out.println("----------------");
+		System.out.println("Node 2 results (using: " + host1.returnGenerator() + " generator): ");
+		System.out.println("Total sent packets: " + host2.sentDelay.size());
+		System.out.println("Total received packets: " + host2.receivedDelay.size());
+		System.out.println("Average delay: " + averageDelay + " ms");
+		System.out.println("Average jitter: " + averagejitter + " ms");
 		
 		//System.out.println(host1.receivedDelay.get(1).toString());
 		

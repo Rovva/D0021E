@@ -149,4 +149,8 @@ public class Node extends SimEnt {
 	public int totalDelay() {
 		return this.totalDelay;
 	}
+	
+	public String returnGenerator() {
+		return this.generator;
+	}
 }
