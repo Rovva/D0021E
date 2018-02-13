@@ -30,9 +30,9 @@ public class Run {
 		
 		// Generate some traffic
 		// host1 will send 3 messages with time interval 5 to network 2, node 1. Sequence starts with number 1
-		host1.StartSending(2, 2, 5, "Poisson", 1, 5); 
+		host1.StartSending(2, 2, 10, "CBR", 1, 5); 
 		// host2 will send 2 messages with time interval 10 to network 1, node 1. Sequence starts with number 10
-		host2.StartSending(1, 1, 5, "Poisson", 10, 10); 
+		host2.StartSending(1, 1, 10, "CBR", 10, 10); 
 		
 		// Start the simulation engine and of we go!
 		Thread t=new Thread(SimEngine.instance());
@@ -99,6 +99,23 @@ public class Run {
 		System.out.println("Total received packets: " + host2.receivedDelay.size());
 		System.out.println("Average delay: " + averageDelay + " ms");
 		System.out.println("Average jitter: " + averagejitter + " ms");
+		System.out.println("----------------");
+		System.out.println("HOST 1");
+		System.out.println("----------------");
+		
+		for (int i = 0; i < host1.sentDelay.size(); i++) {
+			//System.out.println("Message # " + (i+1) + ": " + (host1.receivedDelay.get(i) - host1.sentDelay.get(i)) + " ms");
+			System.out.println((host2.receivedDelay.get(i) - host1.sentDelay.get(i)));
+		}
+		
+		System.out.println("----------------");
+		System.out.println("HOST 2");
+		System.out.println("----------------");
+		
+		for (int i = 0; i < host2.sentDelay.size(); i++) {
+			//System.out.println("Message # " + (i+1) + ": " + (host2.receivedDelay.get(i) - host2.sentDelay.get(i)) + " ms");
+			System.out.println((host1.receivedDelay.get(i) - host2.sentDelay.get(i)));
+		}
 		
 		//System.out.println(host1.receivedDelay.get(1).toString());
 		
