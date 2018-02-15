@@ -5,9 +5,12 @@ package Sim;
 public class Run {
 	public static void main (String [] args)
 	{
+ 		Link link1 = new Link();
+		Link link2 = new Link();
+		
  		//Creates two links (maxDelay, lossProbability)
- 		LossyLink link1 = new LossyLink(50, 0);
-		LossyLink link2 = new LossyLink(30, 0);
+ 		//LossyLink link1 = new LossyLink(50, 0);
+		//LossyLink link2 = new LossyLink(30, 0);
 		
 		// Create two end hosts that will be
 		// communicating via the router
@@ -105,7 +108,7 @@ public class Run {
 		
 		for (int i = 0; i < host1.sentDelay.size(); i++) {
 			//System.out.println("Message # " + (i+1) + ": " + (host1.receivedDelay.get(i) - host1.sentDelay.get(i)) + " ms");
-			System.out.println((host2.receivedDelay.get(i) - host1.sentDelay.get(i)));
+			System.out.println((host1.sentDelay.get(i)));
 		}
 		
 		System.out.println("----------------");
@@ -114,7 +117,7 @@ public class Run {
 		
 		for (int i = 0; i < host2.sentDelay.size(); i++) {
 			//System.out.println("Message # " + (i+1) + ": " + (host2.receivedDelay.get(i) - host2.sentDelay.get(i)) + " ms");
-			System.out.println((host1.receivedDelay.get(i) - host2.sentDelay.get(i)));
+			System.out.println((host2.sentDelay.get(i)));
 		}
 		
 		//System.out.println(host1.receivedDelay.get(1).toString());
