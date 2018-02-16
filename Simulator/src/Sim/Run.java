@@ -1,5 +1,7 @@
 package Sim;
 
+import java.util.Collections;
+
 // An example of how to build a topology and starting the simulation engine
 
 public class Run {
@@ -30,9 +32,9 @@ public class Run {
 		
 		// Generate some traffic
 		// host1 will send 3 messages with time interval 5 to network 2, node 1. Sequence starts with number 1
-		host1.StartSending(2, 2, 100, "Poisson", 1, 5); 
+		host1.StartSending(2, 2, 10000, "Poisson", 1, 5); 
 		// host2 will send 2 messages with time interval 10 to network 1, node 1. Sequence starts with number 10
-		host2.StartSending(1, 1, 100, "Poisson", 10, 10); 
+		host2.StartSending(1, 1, 10000, "Poisson", 10, 10); 
 		
 		// Start the simulation engine and of we go!
 		Thread t=new Thread(SimEngine.instance());
@@ -103,11 +105,36 @@ public class Run {
 		System.out.println("HOST 1");
 		System.out.println("----------------");
 		
+		Collections.sort(host1.sentDelay);
+		
+		
+		int[] array = new int[host1.sentDelay.get(host1.sentDelay.size()-1)];
+		int currentNumber = 0;
+		
 		for (int i = 0; i < host1.sentDelay.size(); i++) {
 			//System.out.println("Message # " + (i+1) + ": " + (host1.receivedDelay.get(i) - host1.sentDelay.get(i)) + " ms");
-			System.out.println((host2.receivedDelay.get(i) - host1.sentDelay.get(i)));
+			//System.out.println((host2.receivedDelay.get(i) - host1.sentDelay.get(i)));
+			//System.out.println(host1.sentDelay.get(i));
+			if(host1.sentDelay.get(i) == currentNumber) {
+				array[currentNumber] = array[currentNumber] + 1;
+				//System.out.println(currentNumber);
+				//System.out.println(currentNumber + " " + host1.sentDelay.get(i));
+			} else {
+				currentNumber++;
+			}
+			
 		}
 		
+		currentNumber = 0;
+		
+		for(int i = 0; i < array.length; i++) {
+			currentNumber = 0;
+			for(int y = 0; y < array[i]; y++) {
+				currentNumber++;
+			}
+			System.out.println(i + " " + currentNumber);
+		}
+		/*
 		System.out.println("----------------");
 		System.out.println("HOST 2");
 		System.out.println("----------------");
@@ -121,7 +148,7 @@ public class Run {
 		
 		//averageDelay = averageDelay/totalSentPackets1;
 		
-		/*
+		
 		double totalSentPackets1 = host1.sentPackets(); //Sent packets for node 1
 		double totalSentPackets2 = host2.sentPackets();	//Sent packets for node 2
 		

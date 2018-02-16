@@ -47,13 +47,13 @@ public class Node extends SimEnt {
 	// In one of the labs you will create some traffic generators
 	
 	private int _stopSendingAfter = 0; //messages
-	private double _timeBetweenSending = 10; //time between messages
+	private int _timeBetweenSending = 10; //time between messages
 	private int _toNetwork = 0;
 	private int _toHost = 0;
 	private int timeInterval;
 	private String generator;
-	public ArrayList<Double> receivedDelay = new ArrayList<Double>();
-	public ArrayList<Double> sentDelay = new ArrayList<Double>();
+	public ArrayList<Integer> receivedDelay = new ArrayList<Integer>();
+	public ArrayList<Integer> sentDelay = new ArrayList<Integer>();
 	
 	public void StartSending(int network, int node, int number, String generator, int startSeq, int cbrInterval)
 	{
@@ -68,13 +68,13 @@ public class Node extends SimEnt {
 		send(this, new TimerEvent(),0);	
 	}
 	
-	public double guassianSendNext(double mean, double deviation) {
+	public int guassianSendNext(double mean, double deviation) {
 		Random rand = new Random();
-		return (rand.nextGaussian() * deviation + mean);
+		return (int)(rand.nextGaussian() * deviation + mean);
 	}
 	
 	// https://stackoverflow.com/questions/1241555/algorithm-to-generate-poisson-and-binomial-random-numbers
-	public double poissonSendNext(double lambda) {
+	public int poissonSendNext(double lambda) {
 		double L = Math.exp(-lambda);
 		  double p = 1.0;
 		  int k = 0;
@@ -102,19 +102,19 @@ public class Node extends SimEnt {
 			{
 				
 				if (generator == "Gaussian") {
-					_timeBetweenSending = guassianSendNext(5.1, 1.1);
+					_timeBetweenSending = guassianSendNext(20, 5);
 				} else if (generator == "Poisson") {
-					_timeBetweenSending = poissonSendNext(5.1);
+					_timeBetweenSending = poissonSendNext(1);
 				} else {
 					_timeBetweenSending = timeInterval;
 				}
-				
+				sentDelay.add(_timeBetweenSending);
 				_sentmsg++;
 				send(_peer, new Message(_id, new NetworkAddr(_toNetwork, _toHost),_seq),0);
 				send(this, new TimerEvent(),_timeBetweenSending);
 				//System.out.println("Node "+_id.networkId()+ "." + _id.nodeId() +" sent message with seq: "+_seq + " at time "+SimEngine.getTime());
-				double time = SimEngine.getTime();
-				sentDelay.add(time);
+				//double time = SimEngine.getTime();
+				//sentDelay.add(time);
 				_seq++;
 			}
 		}
@@ -125,7 +125,7 @@ public class Node extends SimEnt {
 			System.out.println("Node "+_id.networkId()+ "." + _id.nodeId() +" receives message with seq: "+((Message) ev).seq() + 
 					" at time "+SimEngine.getTime());
 			*/
-			double time = SimEngine.getTime();
+			int time = (int)SimEngine.getTime();
 			receivedDelay.add(time);
 			int previousMessageTime = this.lastMessageTime;
 			int currentDelay = (int)SimEngine.getTime() - previousMessageTime;
