@@ -35,9 +35,9 @@ public class Run {
 		
 		// Generate some traffic
 		// host1 will send 3 messages with time interval 5 to network 2, node 1. Sequence starts with number 1
-		host1.StartSending(2, 2, 10000, "Poisson", 1, 5); 
+		host1.StartSending(2, 2, 1000, "Poisson", 1, 5); 
 		// host2 will send 2 messages with time interval 10 to network 1, node 1. Sequence starts with number 10
-		host2.StartSending(1, 1, 10000, "Poisson", 10, 10); 
+		host2.StartSending(1, 1, 1000, "Poisson", 10, 10); 
 		
 		// Start the simulation engine and of we go!
 		Thread t=new Thread(SimEngine.instance());
@@ -109,14 +109,20 @@ public class Run {
 		System.out.println("----------------");
 		
 		Collections.sort(host1.sentDelay);
+		int max = 0;
 		
+		for(int i = 0; i < host1.sentDelay.size(); i++) {
+			if(host1.sentDelay.get(i) >= max) {
+				max = host1.sentDelay.get(i);
+			}
 		
-		int[] array = new int[host1.sentDelay.get(host1.sentDelay.size()-1)];
+		}
+		
+		int[] array = new int[max+1];
 		int currentNumber = 0;
 		
 		for (int i = 0; i < host1.sentDelay.size(); i++) {
 			//System.out.println("Message # " + (i+1) + ": " + (host1.receivedDelay.get(i) - host1.sentDelay.get(i)) + " ms");
-<<<<<<< HEAD
 			//System.out.println((host2.receivedDelay.get(i) - host1.sentDelay.get(i)));
 			//System.out.println(host1.sentDelay.get(i));
 			if(host1.sentDelay.get(i) == currentNumber) {
@@ -126,10 +132,6 @@ public class Run {
 			} else {
 				currentNumber++;
 			}
-			
-=======
-			System.out.println((host1.sentDelay.get(i)));
->>>>>>> origin/master
 		}
 		
 		currentNumber = 0;
