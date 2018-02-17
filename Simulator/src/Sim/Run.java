@@ -34,12 +34,13 @@ public class Run {
 		
 		
 		// Generate some traffic
-		// host1 will send 3 messages with time interval 5 to network 2, node 1. Sequence starts with number 1
+		// host1 will send 1000 messages with time interval 5 to network 2, node 2. Sequence starts with number 1. Generator is CBR.
 		//host1.StartSending(2, 2, 1000, "CBR", 1, 5); 
 		
-		
+		//Use Poisson with Lambda 1
 		//host1.StartSending(1, 1, 1000, "Poisson", 10, 1); 
 		
+		//Use Gaussian with mean 20 and deviation 5
 		host1.StartSending(1, 1, 1000, "Gaussian", 10, 20, 5); 
 		
 		// Start the simulation engine and of we go!
@@ -114,6 +115,7 @@ public class Run {
 		Collections.sort(host1.sentDelay);
 		int max = 0;
 		
+		//Checks for the largest integer to decide how big the array should be
 		for(int i = 0; i < host1.sentDelay.size(); i++) {
 			if(host1.sentDelay.get(i) >= max) {
 				max = host1.sentDelay.get(i);
@@ -124,14 +126,12 @@ public class Run {
 		int[] array = new int[max+1];
 		int currentNumber = 0;
 		
+		//Primary loop to count how many of a certain integer occurs (For plotting purposes)
 		for (int i = 0; i < host1.sentDelay.size(); i++) {
-			//System.out.println("Message # " + (i+1) + ": " + (host1.receivedDelay.get(i) - host1.sentDelay.get(i)) + " ms");
-			//System.out.println((host2.receivedDelay.get(i) - host1.sentDelay.get(i)));
-			//System.out.println(host1.sentDelay.get(i));
+			
 			if(host1.sentDelay.get(i) == currentNumber) {
 				array[currentNumber] = array[currentNumber] + 1;
-				//System.out.println(currentNumber);
-				//System.out.println(currentNumber + " " + host1.sentDelay.get(i));
+
 			} else {
 				currentNumber++;
 			}
@@ -139,6 +139,7 @@ public class Run {
 		
 		currentNumber = 0;
 		
+		//Writes out the result from the calculations above.
 		for(int i = 0; i < array.length; i++) {
 			currentNumber = 0;
 			for(int y = 0; y < array[i]; y++) {

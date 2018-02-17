@@ -52,24 +52,27 @@ public class Node extends SimEnt {
 	private int _toHost = 0;
 	private int timeInterval;	//Constant Bit Rate
 	private int mean;			//Mean value for Poisson/Gaussian Generators
+	private int lambda;
 	private int deviation;		//Deviation for Gaussian
 	private String generator;	//"CBR", "Gaussian" or "Poisson"
 	public ArrayList<Integer> receivedDelay = new ArrayList<Integer>();	//If needed, keeps track of when a node receives the item.
 	public ArrayList<Integer> sentDelay = new ArrayList<Integer>();		//Stores all the packet delays before they are being sent.
 	
+	
 	/*
-	 * 
+	 * @param generator The generator to be used: "CBR" or "Poisson"
+	 * @param cbrOrMean The CBR value if "CBR" generator OR Lambda value if "Poisson"
 	 */
 	
-	public void StartSending(int network, int node, int number, String generator, int startSeq, int cbrOrMean)
+	public void StartSending(int network, int node, int number, String generator, int startSeq, int cbrOrLambda)
 	{
+		//Check if generator is CBR or Poisson.
 		if (generator == "CBR") {
-			this.timeInterval = cbrOrMean;
+			this.timeInterval = cbrOrLambda;	//CBR value
 		} else if (generator == "Poisson") {
-			this.mean = cbrOrMean;
+			this.lambda = cbrOrLambda; 			//Lambda value. 
 		}
 		this.generator = generator;
-		
 		_stopSendingAfter = number;
 		_toNetwork = network;
 		_toHost = node;
@@ -77,10 +80,16 @@ public class Node extends SimEnt {
 		send(this, new TimerEvent(),0);	
 	}
 	
-	public void StartSending(int network, int node, int number, String generator, int startSeq, int cbrOrMean, int deviation)
+	
+	/*
+	 * @param generator Generator to be used. This constructor accepts: "Gaussian"
+	 * @param mean Mean value
+	 * @param deviation Deviation value
+	 */
+	public void StartSending(int network, int node, int number, String generator, int startSeq, int mean, int deviation)
 	{
 		if (generator == "Gaussian") {
-			this.mean = cbrOrMean;
+			this.mean = mean;			
 			this.deviation = deviation;
 		} else {
 			System.out.println("Remove deviation parameter if you want to use CBR!");
@@ -127,36 +136,26 @@ public class Node extends SimEnt {
 			{
 				
 				if (generator == "Gaussian") {
-					_timeBetweenSending = guassianSendNext(this.mean, this.deviation);
+					_timeBetweenSending = guassianSendNext(this.mean, this.deviation); //Gaussian
 				} else if (generator == "Poisson") {
-					_timeBetweenSending = poissonSendNext(this.mean);
+					_timeBetweenSending = poissonSendNext(this.lambda); //Poisson
 				} else {
-					_timeBetweenSending = timeInterval;
+					_timeBetweenSending = timeInterval; //CBR value
 				}
-				sentDelay.add(_timeBetweenSending);
+				sentDelay.add(_timeBetweenSending);		//Store the delay of the packet.
 				_sentmsg++;
 				send(_peer, new Message(_id, new NetworkAddr(_toNetwork, _toHost),_seq),0);
 				send(this, new TimerEvent(),_timeBetweenSending);
-				//System.out.println("Node "+_id.networkId()+ "." + _id.nodeId() +" sent message with seq: "+_seq + " at time "+SimEngine.getTime());
-				//double time = SimEngine.getTime();
-				//sentDelay.add(time);
 				_seq++;
 			}
 		}
 		if (ev instanceof Message)
 		{
 			this.receivedPackets++;
-			/*
-			System.out.println("Node "+_id.networkId()+ "." + _id.nodeId() +" receives message with seq: "+((Message) ev).seq() + 
-					" at time "+SimEngine.getTime());
-			*/
 			int time = (int)SimEngine.getTime();
 			receivedDelay.add(time);
 			int previousMessageTime = this.lastMessageTime;
 			int currentDelay = (int)SimEngine.getTime() - previousMessageTime;
-			System.out.println("");
-			//System.out.println("Current jitter for Node "+_id.networkId()+ "." + _id.nodeId() +": " + currentDelay);
-			System.out.println("");
 			this.lastMessageTime = (int)SimEngine.getTime();
 			this.totalDelay += currentDelay;
 			
