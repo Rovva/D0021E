@@ -50,15 +50,40 @@ public class Node extends SimEnt {
 	private int _timeBetweenSending = 10; //time between messages
 	private int _toNetwork = 0;
 	private int _toHost = 0;
-	private int timeInterval;
-	private String generator;
-	public ArrayList<Integer> receivedDelay = new ArrayList<Integer>();
-	public ArrayList<Integer> sentDelay = new ArrayList<Integer>();
+	private int timeInterval;	//Constant Bit Rate
+	private int mean;			//Mean value for Poisson/Gaussian Generators
+	private int deviation;		//Deviation for Gaussian
+	private String generator;	//"CBR", "Gaussian" or "Poisson"
+	public ArrayList<Integer> receivedDelay = new ArrayList<Integer>();	//If needed, keeps track of when a node receives the item.
+	public ArrayList<Integer> sentDelay = new ArrayList<Integer>();		//Stores all the packet delays before they are being sent.
 	
-	public void StartSending(int network, int node, int number, String generator, int startSeq, int cbrInterval)
+	/*
+	 * 
+	 */
+	
+	public void StartSending(int network, int node, int number, String generator, int startSeq, int cbrOrMean)
 	{
 		if (generator == "CBR") {
-			timeInterval = cbrInterval;
+			this.timeInterval = cbrOrMean;
+		} else if (generator == "Poisson") {
+			this.mean = cbrOrMean;
+		}
+		this.generator = generator;
+		
+		_stopSendingAfter = number;
+		_toNetwork = network;
+		_toHost = node;
+		_seq = startSeq;
+		send(this, new TimerEvent(),0);	
+	}
+	
+	public void StartSending(int network, int node, int number, String generator, int startSeq, int cbrOrMean, int deviation)
+	{
+		if (generator == "Gaussian") {
+			this.mean = cbrOrMean;
+			this.deviation = deviation;
+		} else {
+			System.out.println("Remove deviation parameter if you want to use CBR!");
 		}
 		this.generator = generator;
 		_stopSendingAfter = number;
@@ -102,9 +127,9 @@ public class Node extends SimEnt {
 			{
 				
 				if (generator == "Gaussian") {
-					_timeBetweenSending = guassianSendNext(20, 5);
+					_timeBetweenSending = guassianSendNext(this.mean, this.deviation);
 				} else if (generator == "Poisson") {
-					_timeBetweenSending = poissonSendNext(1);
+					_timeBetweenSending = poissonSendNext(this.mean);
 				} else {
 					_timeBetweenSending = timeInterval;
 				}
