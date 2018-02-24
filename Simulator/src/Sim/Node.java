@@ -54,6 +54,8 @@ public class Node extends SimEnt {
 	private int mean;			//Mean value for Poisson/Gaussian Generators
 	private int lambda;
 	private int deviation;		//Deviation for Gaussian
+	private int interfaceCounter;
+	private int whichInterface;
 	private String generator;	//"CBR", "Gaussian" or "Poisson"
 	public ArrayList<Integer> receivedDelay = new ArrayList<Integer>();	//If needed, keeps track of when a node receives the item.
 	public ArrayList<Integer> sentDelay = new ArrayList<Integer>();		//Stores all the packet delays before they are being sent.
@@ -124,6 +126,8 @@ public class Node extends SimEnt {
 	
 
 	
+
+	
 //**********************************************************************************	
 	
 	// This method is called upon that an event destined for this node triggers.
@@ -152,6 +156,9 @@ public class Node extends SimEnt {
 		if (ev instanceof Message)
 		{
 			this.receivedPackets++;
+			if(this.receivedPackets == this.interfaceCounter) {
+				moveNode(this.whichInterface);
+			}
 			int time = (int)SimEngine.getTime();
 			receivedDelay.add(time);
 			int previousMessageTime = this.lastMessageTime;
@@ -176,5 +183,21 @@ public class Node extends SimEnt {
 	
 	public String returnGenerator() {
 		return this.generator;
+	}
+	
+	public void changeInterfaceCounter(int count, int whichInterface) {
+		
+		this.interfaceCounter = count;
+		this.whichInterface = whichInterface;
+	}
+	
+	/*
+	 * @param newNetworkId The new network to change to.
+	 */
+	public void moveNode(int newNetworkId){
+		this._id.setNetworkId(newNetworkId);
+		_toNetwork = newNetworkId;
+		send (_peer, new changeInterface(whichInterface, (Link)_peer, this), 0);
+		
 	}
 }

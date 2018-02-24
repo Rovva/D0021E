@@ -30,6 +30,13 @@ public class Router extends SimEnt{
 		
 		((Link) link).setConnector(this);
 	}
+	
+	public void changeInterface(int oldInterfaceNumber, int newInterfaceNumber, SimEnt link, SimEnt node){
+		
+		_routingTable[newInterfaceNumber] = _routingTable[oldInterfaceNumber];
+		_routingTable[oldInterfaceNumber] = null;
+				
+	}
 
 	// This method searches for an entry in the routing table that matches
 	// the network number in the destination field of a messages. The link
@@ -50,34 +57,15 @@ public class Router extends SimEnt{
 	}
 	
 	
-	public void interfaceUpdate(NetworkAddr source, int newInterfaceIndex) {
-		for(int i = 0; i < _interfaces; i++){   //Gå igenom alla interfaces
-			if (_routingTable[i] != null){		//Finns det något på denna plats?
-				if(((Node) _routingTable[i].node()).getAddr() == source){	//Är denna plats den nuvarande noden?
-					
-					/*
-					 * Switch to the new interface.
-					 */
-					RouteTableEntry rte = _routingTable[i];					
-					_routingTable[i] = null;
-					_routingTable[newInterfaceIndex] = rte;
-					break;
-				}
-			}
-		}
-	}
-	
 	// When messages are received at the router this method is called
 	
-	public void recv(SimEnt source, Event event)
-	{
-		if (event instanceof Message)
-		{
+	public void recv(SimEnt source, Event event){
+		if (event instanceof Message){
 			System.out.println("Router handles packet with seq: " + ((Message) event).seq()+" from node: "+((Message) event).source().networkId()+"." + ((Message) event).source().nodeId() );
 			SimEnt sendNext = getInterface(((Message) event).destination().networkId());
 			System.out.println("Router sends to node: " + ((Message) event).destination().networkId()+"." + ((Message) event).destination().nodeId());		
 			send (sendNext, event, _now);
-	
+			
 		}	
 	}
 }

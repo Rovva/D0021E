@@ -1,26 +1,27 @@
 package Sim;
 
-public class ChangeInterface implements Event{
-	private NetworkAddr _source;
-	private int _newInterfaceNumber;
+public class changeInterface implements Event {
 	
-	ChangeInterface (NetworkAddr source, int newInterfaceNumber)
-	{
-		_source = source;
-		_newInterfaceNumber = newInterfaceNumber;
+	int newInterface;
+	Link link;
+	Node node;
+	
+	public changeInterface(int newInterface, Link link, Node node){
+		this.newInterface = newInterface;
+		this.link = link;
+		this.node = node;
+		
 	}
 	
-	public NetworkAddr source()
-	{
-		return _source;
+	public int getInterface() {
+		return this.newInterface;
 	}
 	
-	public int newInterfaceNumber()
-	{
-		return _newInterfaceNumber;
-	}
 
-	public void entering(SimEnt locale)
-	{
+	public void entering(SimEnt locale) {
+		// TODO Auto-generated method stub
+		
 	}
+	
+	
 }
