@@ -50,6 +50,23 @@ public class Router extends SimEnt{
 	}
 	
 	
+	public void interfaceUpdate(NetworkAddr source, int newInterfaceIndex) {
+		for(int i = 0; i < _interfaces; i++){   //Gå igenom alla interfaces
+			if (_routingTable[i] != null){		//Finns det något på denna plats?
+				if(((Node) _routingTable[i].node()).getAddr() == source){	//Är denna plats den nuvarande noden?
+					
+					/*
+					 * Switch to the new interface.
+					 */
+					RouteTableEntry rte = _routingTable[i];					
+					_routingTable[i] = null;
+					_routingTable[newInterfaceIndex] = rte;
+					break;
+				}
+			}
+		}
+	}
+	
 	// When messages are received at the router this method is called
 	
 	public void recv(SimEnt source, Event event)
