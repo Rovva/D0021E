@@ -54,7 +54,7 @@ public class Node extends SimEnt {
 	private int mean;			//Mean value for Poisson/Gaussian Generators
 	private int lambda;
 	private int deviation;		//Deviation for Gaussian
-	private int interfaceCounter;
+	public int interfaceCounter;
 	private int whichInterface;
 	private String generator;	//"CBR", "Gaussian" or "Poisson"
 	public ArrayList<Integer> receivedDelay = new ArrayList<Integer>();	//If needed, keeps track of when a node receives the item.
@@ -156,6 +156,8 @@ public class Node extends SimEnt {
 		if (ev instanceof Message)
 		{
 			this.receivedPackets++;
+			System.out.println("FUCKING RECEIVEDPACKETS: " + this.receivedPackets);
+			System.out.println("FUCKING INTERFACECOUNTER: " + this.interfaceCounter);
 			if(this.receivedPackets == this.interfaceCounter) {
 				moveNode(this.whichInterface);
 			}
@@ -197,6 +199,8 @@ public class Node extends SimEnt {
 	public void moveNode(int newNetworkId){
 		this._id.setNetworkId(newNetworkId);
 		_toNetwork = newNetworkId;
+		System.out.println("BALLS");
+
 		send (_peer, new changeInterface(whichInterface, (Link)_peer, this), 0);
 		
 	}

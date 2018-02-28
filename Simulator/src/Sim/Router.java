@@ -16,6 +16,15 @@ public class Router extends SimEnt{
 		_interfaces=interfaces;
 	}
 	
+	public void printRouterTable() {
+		for(int i = 0; i <_routingTable.length; i++) {
+			if(_routingTable[i]!=null) {
+				System.out.println("*** Node: " +((Node)_routingTable[i].node()).getAddr().networkId() + "." + ((Node)_routingTable[i].node()).getAddr().nodeId() + " router interface:" + i);
+			}
+			
+		}
+	}
+	
 	// This method connects links to the router and also informs the 
 	// router of the host connects to the other end of the link
 	
@@ -29,6 +38,19 @@ public class Router extends SimEnt{
 			System.out.println("Trying to connect to port not in router");
 		
 		((Link) link).setConnector(this);
+	}
+	
+	public int disconnectInterface(int networkaddress) {
+		Link routerInterfaceLink = (Link) getInterface(networkaddress);
+		int oldInterface = 0;
+		for(int i = 0 ; i < _interfaces; i++){
+			if(_routingTable[i] !=  null) {
+				if(_routingTable[i].link() ==  routerInterfaceLink){ _routingTable[i] = null; oldInterface = i;}
+			}
+		}
+		
+		routerInterfaceLink.removeConnector(this);
+		return oldInterface;
 	}
 	
 	public void changeInterface(int oldInterfaceNumber, int newInterfaceNumber, SimEnt link, SimEnt node){
@@ -65,7 +87,17 @@ public class Router extends SimEnt{
 			SimEnt sendNext = getInterface(((Message) event).destination().networkId());
 			System.out.println("Router sends to node: " + ((Message) event).destination().networkId()+"." + ((Message) event).destination().nodeId());		
 			send (sendNext, event, _now);
-			
 		}	
+		
+		if (event instanceof changeInterface) {
+			System.out.println("START PRINTING ROUTER TABLE FFS");
+			printRouterTable();
+			
+			changeInterface bajs = (changeInterface)event;
+			disconnectInterface(bajs.getId());
+			connectInterface(bajs.getInterface(), bajs.getLink(), bajs.getNode());
+			
+			printRouterTable();
+		}
 	}
 }

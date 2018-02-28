@@ -17,7 +17,18 @@ public class changeInterface implements Event {
 		return this.newInterface;
 	}
 	
-
+	public Link getLink() {
+		return this.link;
+	}
+	
+	public Node getNode() {
+		return this.node;
+	}
+	
+	public int getId() {
+		return this.node.getAddr().networkId();
+	}
+	
 	public void entering(SimEnt locale) {
 		// TODO Auto-generated method stub
 		

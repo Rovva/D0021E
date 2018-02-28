@@ -28,23 +28,23 @@ public class Run {
 		// the host connected to the other
 		// side of the link is also provided
 		// Note. A switch is created in same way using the Switch class
-		Router routeNode = new Router(2);
+		Router routeNode = new Router(5);
 		routeNode.connectInterface(0, link1, host1);
 		routeNode.connectInterface(1, link2, host2);
 		
-		//Change to interface 1 after 5 messages
-		host1.changeInterfaceCounter(5, 1);
-		
+		//Change to interface 3 after 5 messages
+		host2.changeInterfaceCounter(5, 4);
+				
 		// Generate some traffic
 		// host1 will send 1000 messages with time interval 5 to network 2, node 2. Sequence starts with number 1. Generator is CBR.
-		host1.StartSending(2, 2, 1000, "CBR", 1, 5); 
+		host1.StartSending(2, 2, 20, "CBR", 1, 5); 
 		
 		//Use Poisson with Lambda 1
 		//host1.StartSending(1, 1, 1000, "Poisson", 10, 1); 
 		
-		host1.moveNode(2);
+		//host1.moveNode(2);
 		//(int oldInterface, int newInterface, Link, Node)
-		routeNode.changeInterface(0, 1, link1, host1);
+		//routeNode.changeInterface(0, 1, link1, host1);
 		
 		//Use Gaussian with mean 20 and deviation 5
 		//host1.StartSending(1, 1, 1000, "Gaussian", 10, 20, 5); 
