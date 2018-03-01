@@ -37,7 +37,7 @@ public class Run {
 				
 		// Generate some traffic
 		// host1 will send 1000 messages with time interval 5 to network 2, node 2. Sequence starts with number 1. Generator is CBR.
-		host1.StartSending(2, 2, 20, "CBR", 1, 5); 
+		host1.StartSending(2, 1, 20, "CBR", 1, 5); 
 		
 		//Use Poisson with Lambda 1
 		//host1.StartSending(1, 1, 1000, "Poisson", 10, 1); 

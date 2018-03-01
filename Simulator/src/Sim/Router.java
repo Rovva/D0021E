@@ -85,12 +85,13 @@ public class Router extends SimEnt{
 		if (event instanceof Message){
 			System.out.println("Router handles packet with seq: " + ((Message) event).seq()+" from node: "+((Message) event).source().networkId()+"." + ((Message) event).source().nodeId() );
 			SimEnt sendNext = getInterface(((Message) event).destination().networkId());
+			System.out.println(((Message) event).destination().networkId());
 			System.out.println("Router sends to node: " + ((Message) event).destination().networkId()+"." + ((Message) event).destination().nodeId());		
 			send (sendNext, event, _now);
 		}	
 		
 		if (event instanceof changeInterface) {
-			System.out.println("START PRINTING ROUTER TABLE FFS");
+			System.out.println("START PRINTING ROUTER TABLE");
 			printRouterTable();
 			
 			changeInterface bajs = (changeInterface)event;

@@ -156,8 +156,8 @@ public class Node extends SimEnt {
 		if (ev instanceof Message)
 		{
 			this.receivedPackets++;
-			System.out.println("FUCKING RECEIVEDPACKETS: " + this.receivedPackets);
-			System.out.println("FUCKING INTERFACECOUNTER: " + this.interfaceCounter);
+			System.out.println("RECEIVEDPACKETS: " + this.receivedPackets);
+			System.out.println("INTERFACECOUNTER: " + this.interfaceCounter);
 			if(this.receivedPackets == this.interfaceCounter) {
 				moveNode(this.whichInterface);
 			}
