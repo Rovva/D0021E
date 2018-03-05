@@ -7,6 +7,8 @@ import java.util.Collections;
 public class Run {
 	public static void main (String [] args)
 	{
+		
+		
  		Link link1 = new Link();
 		Link link2 = new Link();
 		
@@ -40,7 +42,7 @@ public class Run {
 		host1.changeToNetwork(afterMessages, changeInterface);			//after the router is changed... change the senders "toNetwork" value
 				
 		// Generate some traffic
-		// host1 will send 1000 messages with time interval 5 to network 2, node 2. Sequence starts with number 1. Generator is CBR.
+		// host1 will send 20 messages with time interval 5 to network 2, node 1. Sequence starts with number 1. Generator is CBR.
 		host1.StartSending(2, 1, 20, "CBR", 1, 5); 
 		
 		//Use Poisson with Lambda 1

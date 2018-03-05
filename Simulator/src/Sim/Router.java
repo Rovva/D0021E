@@ -1,9 +1,12 @@
 package Sim;
 
+import java.util.ArrayList;
+
 // This class implements a simple router
 
 public class Router extends SimEnt{
 
+	public static ArrayList<AgentEntry> TableAgent = new ArrayList<AgentEntry>();
 	private RouteTableEntry [] _routingTable;
 	private int _interfaces;
 	private int _now=0;
@@ -31,15 +34,43 @@ public class Router extends SimEnt{
 	
 	public void connectInterface(int interfaceNumber, SimEnt link, SimEnt node)
 	{
+		int oldID = ((Node)node).getAddr().nodeId();
 		this.updatedInterface = interfaceNumber;
 		if (interfaceNumber<_interfaces)
 		{
+			
+			for (int i = 0; i < _routingTable.length; i++) {
+				if (_routingTable[i] == null) {
+					continue;
+				}
+				
+				if (((Node)_routingTable[i].node()).getAddr().networkId() == oldID) {
+					oldID++;
+					i = 0;
+				}
+			}
 			_routingTable[interfaceNumber] = new RouteTableEntry(link, node);
+			if (((Node)node).getHomeRouter() == null) {
+				((Node)node).setHomeRouter(this);
+			}
 		}
 		else
 			System.out.println("Trying to connect to port not in router");
 		
 		((Link) link).setConnector(this);
+		
+		for (int i = 0; i < _routingTable.length; i++) {
+			RouteTableEntry routeTableEntry = _routingTable[i];
+			if (routeTableEntry != null && ((Node)routeTableEntry.node()).getAddr().networkId() != oldID) {
+				send(this, new RouterAdvertisement(_routingTable), 0);
+			}
+		}
+		
+		for (int i = 0; i < _routingTable.length; i++) {
+			if (_routingTable[i] != null) {
+				System.out.println("" + ((Node)_routingTable[i].node()).getAddr().networkId());
+			}
+		}
 	}
 	
 
@@ -73,6 +104,13 @@ public class Router extends SimEnt{
 				}
 			}
 		return routerInterface;
+	}
+	
+	public void RouterAgentChange(Router router, int nodeNetworkID) {
+		Link link = new Link();
+		link.setConnector(this);
+		link.setConnector(router);
+		TableAgent.add(new AgentEntry(router, link, nodeNetworkID));
 	}
 	
 	

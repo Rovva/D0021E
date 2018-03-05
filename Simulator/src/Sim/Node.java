@@ -14,6 +14,7 @@ public class Node extends SimEnt {
 	private int totalDelay;
 	private int receivedPackets;
 	private int lastMessageTime;
+	private Router homeRouter;
 
 	
 	public Node (int network, int node)
@@ -220,5 +221,13 @@ public class Node extends SimEnt {
 		//Creates a changeInterface event which is triggered in the router class
 		send (_peer, new changeInterface(whichInterface, (Link)_peer, this), 0);  
 		
+	}
+	
+	public Router getHomeRouter () {
+		return this.homeRouter;
+	}
+	
+	public void setHomeRouter(Router router) {
+		this.homeRouter = router;
 	}
 }
