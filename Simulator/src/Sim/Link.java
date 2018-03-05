@@ -42,7 +42,8 @@ public class Link extends SimEnt{
 			} else {
 				send(_connectorA, ev, _now);
 			}
-		} else {
+		} 
+		if (ev instanceof changeInterface) {
 			if (src == _connectorA){
 				send(_connectorB, ev, _now);
 			} else {

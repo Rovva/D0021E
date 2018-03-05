@@ -54,8 +54,10 @@ public class Node extends SimEnt {
 	private int mean;			//Mean value for Poisson/Gaussian Generators
 	private int lambda;
 	private int deviation;		//Deviation for Gaussian
-	public int interfaceCounter;
-	private int whichInterface;
+	public int interfaceCounter;	//Counter for the receiver side. "How many packets before I trigger changeInterface?"
+	private int toNetworkCounter;	//Counter for the sender side. "How many packets do I send before I change my _toNetwork value?"
+	private int whichInterface;		//Which interface the receiver changes to
+	private int toWhichNetwork;		//Which interface the sender sends to.
 	private String generator;	//"CBR", "Gaussian" or "Poisson"
 	public ArrayList<Integer> receivedDelay = new ArrayList<Integer>();	//If needed, keeps track of when a node receives the item.
 	public ArrayList<Integer> sentDelay = new ArrayList<Integer>();		//Stores all the packet delays before they are being sent.
@@ -148,6 +150,11 @@ public class Node extends SimEnt {
 				}
 				sentDelay.add(_timeBetweenSending);		//Store the delay of the packet.
 				_sentmsg++;
+				
+				//Sender changes the interface to send to, when the _sentmsg is equal to the counter.
+				if (toNetworkCounter == _sentmsg){
+					this._toNetwork = this.toWhichNetwork;
+				}
 				send(_peer, new Message(_id, new NetworkAddr(_toNetwork, _toHost),_seq),0);
 				send(this, new TimerEvent(),_timeBetweenSending);
 				_seq++;
@@ -158,9 +165,12 @@ public class Node extends SimEnt {
 			this.receivedPackets++;
 			System.out.println("RECEIVEDPACKETS: " + this.receivedPackets);
 			System.out.println("INTERFACECOUNTER: " + this.interfaceCounter);
+			
+			//Receiver changes the interface upon hitting the receivedpackets counter.
 			if(this.receivedPackets == this.interfaceCounter) {
 				moveNode(this.whichInterface);
 			}
+			
 			int time = (int)SimEngine.getTime();
 			receivedDelay.add(time);
 			int previousMessageTime = this.lastMessageTime;
@@ -187,10 +197,18 @@ public class Node extends SimEnt {
 		return this.generator;
 	}
 	
+	//Initializes the counter for a perticular receiver node.
 	public void changeInterfaceCounter(int count, int whichInterface) {
 		
 		this.interfaceCounter = count;
 		this.whichInterface = whichInterface;
+	}
+	
+	//Initializes the counter for a particular sender node.
+	public void changeToNetwork (int count, int whichInterface){
+		
+		this.toNetworkCounter = count+1;
+		this.toWhichNetwork = whichInterface;
 	}
 	
 	/*
@@ -198,10 +216,9 @@ public class Node extends SimEnt {
 	 */
 	public void moveNode(int newNetworkId){
 		this._id.setNetworkId(newNetworkId);
-		_toNetwork = newNetworkId;
-		System.out.println("BALLS");
-
-		send (_peer, new changeInterface(whichInterface, (Link)_peer, this), 0);
+		
+		//Creates a changeInterface event which is triggered in the router class
+		send (_peer, new changeInterface(whichInterface, (Link)_peer, this), 0);  
 		
 	}
 }

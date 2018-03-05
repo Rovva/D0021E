@@ -7,6 +7,7 @@ public class Router extends SimEnt{
 	private RouteTableEntry [] _routingTable;
 	private int _interfaces;
 	private int _now=0;
+	private int updatedInterface;
 
 	// When created, number of interfaces are defined
 	
@@ -19,7 +20,7 @@ public class Router extends SimEnt{
 	public void printRouterTable() {
 		for(int i = 0; i <_routingTable.length; i++) {
 			if(_routingTable[i]!=null) {
-				System.out.println("*** Node: " +((Node)_routingTable[i].node()).getAddr().networkId() + "." + ((Node)_routingTable[i].node()).getAddr().nodeId() + " router interface:" + i);
+				System.out.println("Node: " +((Node)_routingTable[i].node()).getAddr().networkId() + "." + ((Node)_routingTable[i].node()).getAddr().nodeId() + " router interface:" + i);
 			}
 			
 		}
@@ -30,6 +31,7 @@ public class Router extends SimEnt{
 	
 	public void connectInterface(int interfaceNumber, SimEnt link, SimEnt node)
 	{
+		this.updatedInterface = interfaceNumber;
 		if (interfaceNumber<_interfaces)
 		{
 			_routingTable[interfaceNumber] = new RouteTableEntry(link, node);
@@ -40,6 +42,7 @@ public class Router extends SimEnt{
 		((Link) link).setConnector(this);
 	}
 	
+
 	public int disconnectInterface(int networkaddress) {
 		Link routerInterfaceLink = (Link) getInterface(networkaddress);
 		int oldInterface = 0;
@@ -53,12 +56,6 @@ public class Router extends SimEnt{
 		return oldInterface;
 	}
 	
-	public void changeInterface(int oldInterfaceNumber, int newInterfaceNumber, SimEnt link, SimEnt node){
-		
-		_routingTable[newInterfaceNumber] = _routingTable[oldInterfaceNumber];
-		_routingTable[oldInterfaceNumber] = null;
-				
-	}
 
 	// This method searches for an entry in the routing table that matches
 	// the network number in the destination field of a messages. The link
@@ -83,6 +80,7 @@ public class Router extends SimEnt{
 	
 	public void recv(SimEnt source, Event event){
 		if (event instanceof Message){
+			//((Message) event).destination().setNetworkId(updatedInterface);
 			System.out.println("Router handles packet with seq: " + ((Message) event).seq()+" from node: "+((Message) event).source().networkId()+"." + ((Message) event).source().nodeId() );
 			SimEnt sendNext = getInterface(((Message) event).destination().networkId());
 			System.out.println(((Message) event).destination().networkId());
@@ -90,15 +88,19 @@ public class Router extends SimEnt{
 			send (sendNext, event, _now);
 		}	
 		
-		if (event instanceof changeInterface) {
-			System.out.println("START PRINTING ROUTER TABLE");
+		
+		//changeInterface event is triggered which changes the interface in the RouterTable.
+		else if (event instanceof changeInterface) {		
+			changeInterface temp = (changeInterface)event;	//Grabs the values from the event
+			
+			//Disconnect the receiver node from it's current position in the routerTable
+			disconnectInterface(temp.getId());				
+			
+			connectInterface(temp.getInterface(), temp.getLink(), temp.getNode()); //Connects to the desired interface
+			//updatedInterface = temp.getInterface();
 			printRouterTable();
 			
-			changeInterface bajs = (changeInterface)event;
-			disconnectInterface(bajs.getId());
-			connectInterface(bajs.getInterface(), bajs.getLink(), bajs.getNode());
 			
-			printRouterTable();
 		}
 	}
 }

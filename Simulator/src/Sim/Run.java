@@ -32,15 +32,19 @@ public class Run {
 		routeNode.connectInterface(0, link1, host1);
 		routeNode.connectInterface(1, link2, host2);
 		
-		//Change to interface 3 after 5 messages
-		host2.changeInterfaceCounter(5, 4);
+		int changeInterface = 4;	//The interface to change to when we order a changeInterface Event.
+		int afterMessages = 5;		//After how many messages the changeInterface Event should be triggered.
+		
+		//Change to interface 4 after 5 messages
+		host2.changeInterfaceCounter(afterMessages, changeInterface);	//Change interface for Host 2 and update the router
+		host1.changeToNetwork(afterMessages, changeInterface);			//after the router is changed... change the senders "toNetwork" value
 				
 		// Generate some traffic
 		// host1 will send 1000 messages with time interval 5 to network 2, node 2. Sequence starts with number 1. Generator is CBR.
 		host1.StartSending(2, 1, 20, "CBR", 1, 5); 
 		
 		//Use Poisson with Lambda 1
-		//host1.StartSending(1, 1, 1000, "Poisson", 10, 1); 
+		//host2.StartSending(1, 1, 1000, "Poisson", 10, 1); 
 		
 		//host1.moveNode(2);
 		//(int oldInterface, int newInterface, Link, Node)
