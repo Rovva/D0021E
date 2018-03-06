@@ -32,7 +32,7 @@ public class Router extends SimEnt{
 	// This method connects links to the router and also informs the 
 	// router of the host connects to the other end of the link
 	
-	public void connectInterface(int interfaceNumber, SimEnt link, SimEnt node)
+	public int connectInterface(int interfaceNumber, SimEnt link, SimEnt node)
 	{
 		int oldID = ((Node)node).getAddr().nodeId();
 		this.updatedInterface = interfaceNumber;
@@ -71,10 +71,32 @@ public class Router extends SimEnt{
 				System.out.println("" + ((Node)_routingTable[i].node()).getAddr().networkId());
 			}
 		}
+		return oldID;
 	}
 	
 
-	public int disconnectInterface(int networkaddress) {
+	public int disconnectInterface(SimEnt Node) {
+		for(int i = 0; i < _interfaces; i++) {
+			if(_routingTable[i] == null) {
+				continue;
+			}
+			if (_routingTable[i].node() == Node) {
+				((Node)Node).getLink().removeConnector(this);
+				_routingTable[i] = null;
+				for (int x = 0; i < _routingTable.length; x++) {
+					RouteTableEntry routeTableEntry = _routingTable[x];
+					if (routeTableEntry == null) {
+						send(this, new RouterAdvertisement(_routingTable), 0);
+					}
+				}
+			}
+		}
+		for(int i = 0; i < _routingTable.length; i++) {
+			if (_routingTable[i] != null) {
+				System.out.println("" + ((Node)_routingTable[i].node()).getAddr().networkId());
+			}
+		}
+		
 		Link routerInterfaceLink = (Link) getInterface(networkaddress);
 		int oldInterface = 0;
 		for(int i = 0 ; i < _interfaces; i++){

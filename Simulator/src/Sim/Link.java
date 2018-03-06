@@ -30,6 +30,10 @@ public class Link extends SimEnt{
 			_connectorB = null;
 		}
 	}
+	
+	public SimEnt getThisConnection() {
+		return this._connectorA;
+	}
 
 	// Called when a message enters the link
 	

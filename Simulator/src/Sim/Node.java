@@ -220,7 +220,22 @@ public class Node extends SimEnt {
 		
 		//Creates a changeInterface event which is triggered in the router class
 		send (_peer, new changeInterface(whichInterface, (Link)_peer, this), 0);  
-		
+	}
+	
+	public void interfaceChange(Router newRouter, int newInterface) {
+		Router r = (Router)getPeerLink().getThisConnection();
+		if (r == null) {
+			return;
+		}
+		r.disconnectInterface(this);
+	}
+	
+	public Link getPeerLink() {
+		return ((Link) this._peer);
+	}
+	
+	public Link getLink() {
+		return (Link)((SimEnt)this);		
 	}
 	
 	public Router getHomeRouter () {
