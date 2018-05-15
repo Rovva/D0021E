@@ -54,9 +54,15 @@ public class Node extends SimEnt {
 	private int mean;			//Mean value for Poisson/Gaussian Generators
 	private int lambda;
 	private int deviation;		//Deviation for Gaussian
+	public int interfaceCounter;	//Counter for the receiver side. "How many packets before I trigger changeInterface?"
+	private int toNetworkCounter;	//Counter for the sender side. "How many packets do I send before I change my _toNetwork value?"
+	private int whichInterface;		//Which interface the receiver changes to
+	private int toWhichNetwork;		//Which interface the sender sends to.
 	private String generator;	//"CBR", "Gaussian" or "Poisson"
 	public ArrayList<Integer> receivedDelay = new ArrayList<Integer>();	//If needed, keeps track of when a node receives the item.
 	public ArrayList<Integer> sentDelay = new ArrayList<Integer>();		//Stores all the packet delays before they are being sent.
+	private SimEnt homeAgent;
+	private NetworkAddr homeOfAddress;
 	
 	
 	/*
@@ -124,6 +130,8 @@ public class Node extends SimEnt {
 	
 
 	
+
+	
 //**********************************************************************************	
 	
 	// This method is called upon that an event destined for this node triggers.
@@ -144,6 +152,11 @@ public class Node extends SimEnt {
 				}
 				sentDelay.add(_timeBetweenSending);		//Store the delay of the packet.
 				_sentmsg++;
+				
+				//Sender changes the interface to send to, when the _sentmsg is equal to the counter.
+				if (toNetworkCounter == _sentmsg){
+					this._toNetwork = this.toWhichNetwork;
+				}
 				send(_peer, new Message(_id, new NetworkAddr(_toNetwork, _toHost),_seq),0);
 				send(this, new TimerEvent(),_timeBetweenSending);
 				_seq++;
@@ -152,14 +165,63 @@ public class Node extends SimEnt {
 		if (ev instanceof Message)
 		{
 			this.receivedPackets++;
+			System.out.println("RECEIVEDPACKETS: " + this.receivedPackets);
+			System.out.println("INTERFACECOUNTER: " + this.interfaceCounter);
+			
+			//Receiver changes the interface upon hitting the receivedpackets counter.
+			if(this.receivedPackets == this.interfaceCounter) {
+				moveNode(this.whichInterface);
+			}
+			
 			int time = (int)SimEngine.getTime();
 			receivedDelay.add(time);
 			int previousMessageTime = this.lastMessageTime;
 			int currentDelay = (int)SimEngine.getTime() - previousMessageTime;
 			this.lastMessageTime = (int)SimEngine.getTime();
 			this.totalDelay += currentDelay;
+		}
+		
+		if (ev instanceof notifySender){
+			notifySender temp = (notifySender)ev;
+			System.out.println("SQUEEEEK");
+			System.out.println(this._id.networkId() + "." + this._id.nodeId());
+			this._toNetwork = temp.getInterface();
+
+		}
+		
+		if (ev instanceof MoveMobile) {
+			System.out.println("MOVE MOBILE TO A NEW ROUTER!!!");
+			MoveMobile temp = (MoveMobile)ev;
+			Router oldRouter = temp.getOldRouter();
+			Router newRouter = temp.getNewRouter();
+			int newInterface = temp.getNewInterface();
+			
+			
+			oldRouter.printRouterTable();
+			oldRouter.disconnectInterface(_id.networkId());
+			
+			System.out.println("*** PRINT OLD ROUTER TABLE ***");
+			oldRouter.printRouterTable();
+			this._id.setNetworkId(newRouter.getNetworkID());
+			System.out.println("*** PRINT NEW ROUTER TABLE ***");
+			newRouter.printRouterTable();
+			System.out.println("*** MOVING NODE TO NEW ROUTER TABLE... ***");
+			newRouter.connectInterface(temp.getNewInterface(), (Link)_peer, this);
+			System.out.println("*** PRINT NEW ROUTER TABLE WITH NEW NODE ***");
+			newRouter.printRouterTable();
+			System.out.println("WE HAVE NOW MOVED? CAN WE SEND, THOUGH?");
+			NetworkAddr oldID = new NetworkAddr(oldRouter.getNetworkID(), _id.nodeId());
+			NetworkAddr newID = new NetworkAddr(newRouter.getNetworkID(), _id.nodeId());
+			updateRouterHA(oldID, newID);
+			//oldRouter.updateHA(oldID, newID);
+			//oldRouter.homeAgent.agentTable.put(oldID, newID);
+			/*oldRouter.homeAgent.agentTable.put(oldRouter.getNetworkID() +
+					"." + _id.nodeId(), newRouter.getNetworkID() +
+					"." + _id.nodeId());*/
+			
 			
 		}
+		
 	}
 	
 	public int sentPackets() {
@@ -176,5 +238,59 @@ public class Node extends SimEnt {
 	
 	public String returnGenerator() {
 		return this.generator;
+	}
+	
+	//Initializes the counter for a perticular receiver node.
+	public void changeInterfaceCounter(int count, int whichInterface) {
+		
+		this.interfaceCounter = count;
+		this.whichInterface = whichInterface;
+	}
+	
+	//Initializes the counter for a particular sender node.
+	public void changeToNetwork (int count, int whichInterface){
+		
+		this.toNetworkCounter = count+1;
+		this.toWhichNetwork = whichInterface;
+	}
+	
+	public void updateRouterHA(NetworkAddr oldID, NetworkAddr newID) {
+		send(homeAgent, new AddressUpdate(oldID, newID), 0);
+	}
+	
+	/*
+	 * @param newNetworkId The new network to change to.
+	 */
+	public void moveNode(int newNetworkId){
+		//this._id.setNetworkId(newNetworkId);
+		
+		//Creates a changeInterface event which is triggered in the router class
+		send (_peer, new changeInterface(whichInterface, (Link)_peer, this), 0);  
+		
+	}
+	
+	public void moveMobileNode(Router oldRouter, Router newRouter, int newInterface, int delay) {
+		send (this, new MoveMobile(oldRouter, newRouter, newInterface), delay);
+	}
+	
+	public int getToNetwork() {
+		return this._toNetwork;
+	}
+	
+	public int getToHost() {
+		return this._toHost;
+	}
+	
+	public void setToNetwork(int newToNetwork) {
+		this._toNetwork = newToNetwork;
+	}
+	
+	public void setToHost(int newToHost) {
+		this._toHost = newToHost;
+	}
+	
+	public void setHomeAgent (Router r) {
+		this.homeAgent = r;
+		this.homeOfAddress = this._id;
 	}
 }

@@ -30,7 +30,12 @@ public class Message implements Event{
 	{
 		return _seq; 
 	}
-
+	
+	public void setDestination(NetworkAddr newDestination) {
+		_destination = newDestination;
+	}
+	
+	
 	public void entering(SimEnt locale)
 	{
 	}

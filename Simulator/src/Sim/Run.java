@@ -9,6 +9,8 @@ public class Run {
 	{
  		Link link1 = new Link();
 		Link link2 = new Link();
+		Link link3 = new Link();
+		Link link4 = new Link();
 		
  		//Creates two links (maxDelay, lossProbability)
  		//LossyLink link1 = new LossyLink(50, 0);
@@ -17,7 +19,7 @@ public class Run {
 		// Create two end hosts that will be
 		// communicating via the router
 		Node host1 = new Node(1,1);
-		Node host2 = new Node(2,1);
+		Node host2 = new Node(1,2);
 
 		//Connect links to hosts
 		host1.setPeer(link1);
@@ -28,20 +30,42 @@ public class Run {
 		// the host connected to the other
 		// side of the link is also provided
 		// Note. A switch is created in same way using the Switch class
-		Router routeNode = new Router(2);
-		routeNode.connectInterface(0, link1, host1);
-		routeNode.connectInterface(1, link2, host2);
+		Router router1 = new Router(1, 5);
+		Router router2 = new Router(2, 5);
+		
+		host1.setHomeAgent(router1);
+		host2.setHomeAgent(router1);
 		
 		
+		router1.connectInterface(0, link1, host1);
+		router1.connectInterface(1, link2, host2);
+		router1.connectInterface(2, link3, router2);
+		router2.connectInterface(2, link3, router1);
+		
+		int changeInterface = 4;	//The interface to change to when we order a changeInterface Event.
+		int afterMessages = 5;		//After how many messages the changeInterface Event should be triggered.
+		
+		//Change to interface 4 after 5 messages
+		//host2.changeInterfaceCounter(afterMessages, changeInterface);	//Change interface for Host 2 and update the router
+		//host1.changeToNetwork(afterMessages, changeInterface);			//after the router is changed... change the senders "toNetwork" value
+				
 		// Generate some traffic
-		// host1 will send 1000 messages with time interval 5 to network 2, node 2. Sequence starts with number 1. Generator is CBR.
-		//host1.StartSending(2, 2, 1000, "CBR", 1, 5); 
+		// host1 will send 20 messages with time interval 5 to network 2, node 1. Sequence starts with number 1. Generator is CBR.
+		host1.StartSending(1, 2, 20, "CBR", 1, 5); 
+		
+		host2.moveMobileNode(router1, router2, 3, 50);
 		
 		//Use Poisson with Lambda 1
-		//host1.StartSending(1, 1, 1000, "Poisson", 10, 1); 
+		//host2.StartSending(1, 1, 1000, "Poisson", 10, 1); 
+		
+		//host1.moveNode(2);
+		//(int oldInterface, int newInterface, Link, Node)
+		//routeNode.changeInterface(0, 1, link1, host1);
 		
 		//Use Gaussian with mean 20 and deviation 5
-		host1.StartSending(1, 1, 1000, "Gaussian", 10, 20, 5); 
+		//host1.StartSending(1, 1, 1000, "Gaussian", 10, 20, 5); 
+		
+		
 		
 		// Start the simulation engine and of we go!
 		Thread t=new Thread(SimEngine.instance());
