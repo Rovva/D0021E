@@ -7,6 +7,8 @@ import java.util.Collections;
 public class Run {
 	public static void main (String [] args)
 	{
+		
+		
  		Link link1 = new Link();
 		Link link2 = new Link();
 		
@@ -28,20 +30,32 @@ public class Run {
 		// the host connected to the other
 		// side of the link is also provided
 		// Note. A switch is created in same way using the Switch class
-		Router routeNode = new Router(2);
+		Router routeNode = new Router(5);
 		routeNode.connectInterface(0, link1, host1);
 		routeNode.connectInterface(1, link2, host2);
 		
+		int changeInterface = 4;	//The interface to change to when we order a changeInterface Event.
+		int afterMessages = 5;		//After how many messages the changeInterface Event should be triggered.
 		
+		//Change to interface 4 after 5 messages
+		host2.changeInterfaceCounter(afterMessages, changeInterface);	//Change interface for Host 2 and update the router
+		host1.changeToNetwork(afterMessages, changeInterface);			//after the router is changed... change the senders "toNetwork" value
+				
 		// Generate some traffic
-		// host1 will send 1000 messages with time interval 5 to network 2, node 2. Sequence starts with number 1. Generator is CBR.
-		//host1.StartSending(2, 2, 1000, "CBR", 1, 5); 
+		// host1 will send 20 messages with time interval 5 to network 2, node 1. Sequence starts with number 1. Generator is CBR.
+		host1.StartSending(2, 1, 20, "CBR", 1, 5); 
 		
 		//Use Poisson with Lambda 1
-		//host1.StartSending(1, 1, 1000, "Poisson", 10, 1); 
+		//host2.StartSending(1, 1, 1000, "Poisson", 10, 1); 
+		
+		//host1.moveNode(2);
+		//(int oldInterface, int newInterface, Link, Node)
+		//routeNode.changeInterface(0, 1, link1, host1);
 		
 		//Use Gaussian with mean 20 and deviation 5
-		host1.StartSending(1, 1, 1000, "Gaussian", 10, 20, 5); 
+		//host1.StartSending(1, 1, 1000, "Gaussian", 10, 20, 5); 
+		
+		
 		
 		// Start the simulation engine and of we go!
 		Thread t=new Thread(SimEngine.instance());
