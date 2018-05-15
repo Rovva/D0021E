@@ -20,10 +20,6 @@ public class NetworkAddr {
 		return _networkId;
 	}
 	
-	public void setNetworkId(int networkId){
-		this._networkId = networkId;
-	}
-	
 	public int nodeId()
 	{
 		return _nodeId;
